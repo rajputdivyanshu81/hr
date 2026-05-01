@@ -14,7 +14,10 @@
     "fast-csv": "^5.0.1",
     "gray-matter": "^4.0.3",
     "groq-sdk": "^0.3.2",
-    "natural": "^6.10.4"
+    "natural": "^6.10.4",
+    "wink-bm25-text-search": "^3.1.2",
+    "wink-eng-lite-web-model": "^1.8.1",
+    "wink-nlp": "^2.4.0"
   },
   "devDependencies": {
     "@types/node": "^20.12.7",

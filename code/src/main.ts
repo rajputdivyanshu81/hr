@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import { readTickets, writeOutput } from './csv_handler';
 import { loadCorpus } from './corpus_loader';
+import { CorpusRetriever } from './retriever';
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
@@ -46,6 +47,19 @@ async function main() {
             console.log(`Title: ${corpus[0].title}`);
             console.log(`Domain: ${corpus[0].domain}`);
             console.log(`Content length: ${corpus[0].content.length} chars`);
+        }
+
+        // Test Retriever
+        console.log("Testing Retriever...");
+        const retriever = new CorpusRetriever();
+        retriever.indexCorpus(corpus);
+        
+        const sampleQuery = "How do I add extra time for a candidate assessment?";
+        console.log(`Searching for: "${sampleQuery}"`);
+        const results = retriever.search(sampleQuery, 2, 'hackerrank');
+        console.log(`Found ${results.length} results.`);
+        if (results.length > 0) {
+            console.log(`Top result: ${results[0].title} (Score: ${results[0].score.toFixed(2)})`);
         }
 
     } catch (error) {
