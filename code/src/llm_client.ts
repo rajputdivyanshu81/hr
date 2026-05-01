@@ -64,8 +64,9 @@ export async function getLLMResponse(prompt: AgentPrompt): Promise<AgentResponse
                     { role: 'user', content: prompt.userPrompt }
                 ],
                 model: DEFAULT_MODEL,
-                temperature: 0.1,
+                temperature: 0,
                 max_tokens: 1024,
+                seed: 42, // deterministic outputs
                 response_format: { type: 'json_object' }
             });
 
