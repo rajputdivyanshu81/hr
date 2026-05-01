@@ -51,7 +51,7 @@ export interface OutputTicket {
     product_area: string;
     response: string;
     justification: string;
-    request_type: 'product_issue' | 'feature_request' | 'bug' | 'invalid';
+    request_type: string;
 }
 
 /**
