@@ -1,0 +1,23 @@
+{
+  "name": "hackerrank-orchestrate-agent",
+  "version": "1.0.0",
+  "description": "Multi-Domain Support Triage Agent",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/main.ts",
+    "dev": "ts-node src/main.ts"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.4.5",
+    "fast-csv": "^5.0.1",
+    "groq-sdk": "^0.3.2",
+    "natural": "^6.10.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
