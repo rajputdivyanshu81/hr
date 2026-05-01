@@ -38,8 +38,8 @@ async function main() {
 
     // ── Step 3: Read tickets ─────────────────────────────────────────────
     console.log("[3/4] Reading support tickets...");
-    const sampleCsvPath = path.resolve(__dirname, '../../support_tickets/sample_support_tickets.csv');
-    const tickets = await readTickets(sampleCsvPath);
+    const inputCsvPath = path.resolve(__dirname, '../../support_tickets/support_tickets.csv');
+    const tickets = await readTickets(inputCsvPath);
     console.log(`  → Loaded ${tickets.length} tickets.`);
 
     // ── Step 4: Process each ticket ──────────────────────────────────────
@@ -68,8 +68,8 @@ async function main() {
                 status: 'escalated',
                 product_area: domain === 'unknown' ? 'general_support' : `${domain}_support`,
                 response: '',
-                justification: 'Ticket contains sensitive keywords (fraud, stolen, hacked, etc.) and requires human review.',
-                request_type: 'sensitive_issue'
+                justification: 'Ticket contains sensitive keywords (fraud, hacked, etc.) and requires human review.',
+                request_type: 'product_issue'
             });
             continue;
         }
@@ -92,7 +92,7 @@ async function main() {
                 product_area: 'system_error',
                 response: '',
                 justification: 'LLM call failed, escalating for human review.',
-                request_type: 'unknown'
+                request_type: 'product_issue'
             };
         }
 

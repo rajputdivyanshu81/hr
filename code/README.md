@@ -42,7 +42,7 @@ npm start
 This will:
 1. Load the support corpus (774 markdown documents)
 2. Build a BM25 search index
-3. Read tickets from `support_tickets/sample_support_tickets.csv`
+3. Read tickets from `support_tickets/support_tickets.csv`
 4. For each ticket: classify → retrieve → prompt → safety-check → output
 5. Write results to `support_tickets/output.csv`
 
@@ -54,7 +54,7 @@ This will:
 | `product_area` | string | General category of the issue                  |
 | `response`     | string | Agent reply (empty if escalated)               |
 | `justification`| string | Reasoning for the decision                     |
-| `request_type` | string | Type of request (e.g. `technical_support`)     |
+| `request_type` | string | One of: `product_issue`, `feature_request`, `bug`, `invalid` |
 
 ## Safety & Escalation
 

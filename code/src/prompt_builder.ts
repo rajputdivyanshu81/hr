@@ -29,17 +29,23 @@ You must use ONLY the provided knowledge base (corpus documents) to answer. If t
 
 Output your response STRICTLY as a JSON object with the following schema:
 {
-  "status": "replied" | "escalated",
-  "product_area": "string (the general category of the issue)",
-  "response": "string (your reply to the user if status is 'replied', or an internal note if 'escalated')",
-  "justification": "string (reasoning for why you chose to reply or escalate)",
-  "request_type": "string (e.g., 'billing_issue', 'technical_support', 'general_inquiry')"
+  "status": "replied" or "escalated",
+  "product_area": "string — the most relevant support category or domain area (e.g., screen, privacy, community, travel_support, general_support, conversation_management)",
+  "response": "string — your reply to the user if status is 'replied'. If status is 'escalated', leave this as an empty string.",
+  "justification": "string — a concise explanation of your routing decision and which corpus docs you used",
+  "request_type": "string — MUST be exactly one of: product_issue, feature_request, bug, invalid"
 }
 
 CRITICAL RULES:
-1. Do not hallucinate or invent information. Rely solely on the provided context.
-2. For sensitive topics (e.g., fraud, major security breaches, complex billing disputes that aren't FAQs), choose "escalated".
-3. Return ONLY valid JSON. Do not include markdown formatting like \`\`\`json.`;
+1. Do NOT hallucinate or invent information. Rely solely on the provided context documents.
+2. If the ticket is about a real product issue or question that the corpus can answer, use request_type "product_issue".
+3. If the ticket asks for a new feature or capability, use request_type "feature_request".
+4. If the ticket reports a system bug, outage, or malfunction, use request_type "bug".
+5. If the ticket is irrelevant, off-topic, spam, or not a real support request, use request_type "invalid".
+6. If the corpus provides a clear answer to the question, set status to "replied" and provide a helpful, corpus-grounded response.
+7. If the issue is too complex, involves account-specific actions requiring admin access, or the corpus doesn't have a clear answer, set status to "escalated".
+8. For lost/stolen card reports where the corpus provides emergency contact numbers, you SHOULD reply with those numbers — that IS an answerable FAQ.
+9. Return ONLY valid JSON. Do not include markdown formatting.`;
 
     const userPrompt = `Incoming Support Ticket:
 Subject: ${ticket.subject}
