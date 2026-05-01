@@ -3,6 +3,7 @@ import * as path from 'path';
 import { readTickets, writeOutput } from './csv_handler';
 import { loadCorpus } from './corpus_loader';
 import { CorpusRetriever } from './retriever';
+import { classifyDomain } from './classifier';
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
@@ -60,6 +61,19 @@ async function main() {
         console.log(`Found ${results.length} results.`);
         if (results.length > 0) {
             console.log(`Top result: ${results[0].title} (Score: ${results[0].score.toFixed(2)})`);
+        }
+
+        // Test Classifier
+        console.log("Testing Classifier...");
+        if (tickets.length > 0) {
+            // Find a ticket with company "None" to test inference
+            const noneTicket = tickets.find(t => t.company?.toLowerCase() === 'none' || !t.company);
+            const ticketToClassify = noneTicket || tickets[0];
+            
+            console.log(`Classifying ticket: "${ticketToClassify.issue.substring(0, 50)}..."`);
+            console.log(`Explicit Company: ${ticketToClassify.company}`);
+            const domain = classifyDomain(ticketToClassify);
+            console.log(`Classified Domain: ${domain}`);
         }
 
     } catch (error) {
