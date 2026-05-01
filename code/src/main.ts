@@ -5,6 +5,7 @@ import { loadCorpus } from './corpus_loader';
 import { CorpusRetriever } from './retriever';
 import { classifyDomain } from './classifier';
 import { buildPrompt } from './prompt_builder';
+import { getLLMResponse } from './llm_client';
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
@@ -79,9 +80,13 @@ async function main() {
             // Build Prompt
             const prompt = buildPrompt(ticketToClassify, domain, contextDocs);
             console.log("--- Generated System Prompt ---");
-            console.log(prompt.systemPrompt.substring(0, 200) + "...");
-            console.log("--- Generated User Prompt ---");
-            console.log(prompt.userPrompt.substring(0, 200) + "...");
+            console.log(prompt.systemPrompt.substring(0, 100) + "...");
+            
+            // Test Groq LLM API
+            console.log("Sending prompt to Groq API...");
+            const llmResponse = await getLLMResponse(prompt);
+            console.log("--- LLM Response ---");
+            console.log(JSON.stringify(llmResponse, null, 2));
         }
 
     } catch (error) {

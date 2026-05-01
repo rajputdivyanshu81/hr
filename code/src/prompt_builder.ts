@@ -19,7 +19,7 @@ export function buildPrompt(ticket: SupportTicket, domain: Domain, contextDocs: 
 Title: ${doc.title}
 URL: ${doc.url}
 Content:
-${doc.content}
+${doc.content.substring(0, 1500)}${doc.content.length > 1500 ? '... [truncated]' : ''}
 `).join('\n');
     }
 
