@@ -2,6 +2,18 @@
 
 A terminal-based AI agent that triages support tickets across **HackerRank**, **Claude**, and **Visa** ecosystems using the **Groq API** with RAG (Retrieval Augmented Generation).
 
+## Approach Overview
+
+This agent implements a robust **RAG (Retrieval-Augmented Generation)** pipeline designed for high accuracy and safety. Key design decisions include:
+
+1.  **Local BM25 Retrieval**: Uses the `wink-bm25-text-search` engine to index the provided support corpus. This ensures that the agent's knowledge is strictly grounded in the official documentation, avoiding hallucinations from the model's internal training data.
+2.  **Domain-Aware Classification**: A keyword-based heuristic classifier identifies the product ecosystem (HackerRank, Claude, or Visa) to filter the search space and improve retrieval precision.
+3.  **Multi-Layered Safety**: 
+    *   **Pre-LLM**: Keywords like `fraud` or `hacked` trigger immediate escalation to human agents.
+    *   **Post-LLM**: A secondary validation layer scans model responses for uncertainty phrases or "contact support" redirects, overriding them to `escalated` to prevent unhelpful automated loops.
+4.  **Structured JSON Output**: Utilizes Groq's native JSON mode to ensure the agent outputs data exactly matching the required schema for automated evaluation.
+5.  **Deterministic Reasoning**: LLM parameters are set to zero temperature with a fixed seed to ensure consistent, reproducible triage across different runs.
+
 ## Architecture
 
 ```
