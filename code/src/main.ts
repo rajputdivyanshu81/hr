@@ -5,7 +5,8 @@ import { loadCorpus } from './corpus_loader';
 import { CorpusRetriever } from './retriever';
 import { classifyDomain } from './classifier';
 import { buildPrompt } from './prompt_builder';
-import { getLLMResponse } from './llm_client';
+import { getLLMResponse, AgentResponse } from './llm_client';
+import { requiresImmediateEscalation, enforceEscalationSafety } from './safety_layer';
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
@@ -77,6 +78,13 @@ async function main() {
             const query = `${ticketToClassify.subject} ${ticketToClassify.issue}`;
             const contextDocs = retriever.search(query, 2, domain === 'unknown' ? undefined : domain);
             
+            // Test pre-LLM safety check
+            if (requiresImmediateEscalation(ticketToClassify)) {
+                console.log("--- Safety Layer: Immediate Escalation Triggered ---");
+                console.log("Issue contains highly sensitive keywords.");
+                return;
+            }
+
             // Build Prompt
             const prompt = buildPrompt(ticketToClassify, domain, contextDocs);
             console.log("--- Generated System Prompt ---");
@@ -84,9 +92,13 @@ async function main() {
             
             // Test Groq LLM API
             console.log("Sending prompt to Groq API...");
-            const llmResponse = await getLLMResponse(prompt);
-            console.log("--- LLM Response ---");
-            console.log(JSON.stringify(llmResponse, null, 2));
+            const rawLlmResponse = await getLLMResponse(prompt);
+            
+            // Post-LLM safety check
+            const finalResponse = enforceEscalationSafety(rawLlmResponse);
+
+            console.log("--- Final LLM Response ---");
+            console.log(JSON.stringify(finalResponse, null, 2));
         }
 
     } catch (error) {
