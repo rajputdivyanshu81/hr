@@ -45,3 +45,34 @@ export async function readTickets(filePath: string): Promise<SupportTicket[]> {
             });
     });
 }
+
+export interface OutputTicket {
+    status: 'replied' | 'escalated';
+    product_area: string;
+    response: string;
+    justification: string;
+    request_type: 'product_issue' | 'feature_request' | 'bug' | 'invalid';
+}
+
+/**
+ * Writes processed tickets to an output CSV file.
+ * @param filePath The path where the output CSV should be saved.
+ * @param tickets The array of OutputTicket objects to write.
+ * @returns A promise that resolves when writing is complete.
+ */
+export async function writeOutput(filePath: string, tickets: OutputTicket[]): Promise<void> {
+    const { format } = require('fast-csv');
+    return new Promise((resolve, reject) => {
+        const ws = fs.createWriteStream(filePath);
+        const csvStream = format({ headers: true });
+        
+        csvStream.pipe(ws)
+            .on('finish', () => resolve())
+            .on('error', (error: any) => reject(error));
+            
+        for (const ticket of tickets) {
+            csvStream.write(ticket);
+        }
+        csvStream.end();
+    });
+}

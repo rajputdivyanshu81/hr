@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 import * as path from 'path';
-import { readTickets } from './csv_handler';
+import { readTickets, writeOutput } from './csv_handler';
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
@@ -17,15 +17,26 @@ async function main() {
     console.log("Agent setup complete. Reading support tickets...");
     
     const sampleCsvPath = path.resolve(__dirname, '../../support_tickets/sample_support_tickets.csv');
+    const outputPath = path.resolve(__dirname, '../../support_tickets/output.csv');
     try {
         const tickets = await readTickets(sampleCsvPath);
         console.log(`Successfully loaded ${tickets.length} tickets from ${sampleCsvPath}`);
-        if (tickets.length > 0) {
-            console.log("First ticket sample:");
-            console.log(JSON.stringify(tickets[0], null, 2));
-        }
+        
+        // Test CSV writing with dummy data matching the required schema
+        console.log("Testing CSV writer...");
+        await writeOutput(outputPath, [
+            {
+                status: 'replied',
+                product_area: 'general_support',
+                response: 'This is a test response.',
+                justification: 'This is a test justification.',
+                request_type: 'product_issue'
+            }
+        ]);
+        console.log(`Successfully wrote test output to ${outputPath}`);
+        
     } catch (error) {
-        console.error("Failed to read CSV:", error);
+        console.error("Failed to process CSV:", error);
     }
 }
 
