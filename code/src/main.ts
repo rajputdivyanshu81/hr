@@ -4,6 +4,7 @@ import { readTickets, writeOutput } from './csv_handler';
 import { loadCorpus } from './corpus_loader';
 import { CorpusRetriever } from './retriever';
 import { classifyDomain } from './classifier';
+import { buildPrompt } from './prompt_builder';
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
@@ -63,17 +64,24 @@ async function main() {
             console.log(`Top result: ${results[0].title} (Score: ${results[0].score.toFixed(2)})`);
         }
 
-        // Test Classifier
-        console.log("Testing Classifier...");
+        // Test Classifier and Prompt Builder
+        console.log("Testing Classifier and Prompt Builder...");
         if (tickets.length > 0) {
-            // Find a ticket with company "None" to test inference
-            const noneTicket = tickets.find(t => t.company?.toLowerCase() === 'none' || !t.company);
-            const ticketToClassify = noneTicket || tickets[0];
-            
-            console.log(`Classifying ticket: "${ticketToClassify.issue.substring(0, 50)}..."`);
-            console.log(`Explicit Company: ${ticketToClassify.company}`);
+            const ticketToClassify = tickets[0];
+            console.log(`Ticket: "${ticketToClassify.issue.substring(0, 50)}..."`);
             const domain = classifyDomain(ticketToClassify);
             console.log(`Classified Domain: ${domain}`);
+
+            // Retrieve context for this ticket
+            const query = `${ticketToClassify.subject} ${ticketToClassify.issue}`;
+            const contextDocs = retriever.search(query, 2, domain === 'unknown' ? undefined : domain);
+            
+            // Build Prompt
+            const prompt = buildPrompt(ticketToClassify, domain, contextDocs);
+            console.log("--- Generated System Prompt ---");
+            console.log(prompt.systemPrompt.substring(0, 200) + "...");
+            console.log("--- Generated User Prompt ---");
+            console.log(prompt.userPrompt.substring(0, 200) + "...");
         }
 
     } catch (error) {
