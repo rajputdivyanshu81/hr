@@ -45,9 +45,14 @@ async function main() {
     // ── Step 4: Process each ticket ──────────────────────────────────────
     console.log("[4/4] Processing tickets...");
     const outputTickets: OutputTicket[] = [];
+    const startTime = Date.now();
 
     for (let i = 0; i < tickets.length; i++) {
         const ticket = tickets[i];
+        const pct = Math.round(((i + 1) / tickets.length) * 100);
+        const bar = '█'.repeat(Math.floor(pct / 5)) + '░'.repeat(20 - Math.floor(pct / 5));
+        process.stdout.write(`\r  [${bar}] ${pct}% (${i + 1}/${tickets.length})`);
+        console.log('');
         console.log(`\n── Ticket ${i + 1}/${tickets.length} ──────────────────────────────`);
         console.log(`  Subject: ${ticket.subject}`);
         console.log(`  Company: ${ticket.company}`);
@@ -114,7 +119,8 @@ async function main() {
     // ── Step 5: Write output CSV ─────────────────────────────────────────
     const outputPath = path.resolve(__dirname, '../../support_tickets/output.csv');
     await writeOutput(outputPath, outputTickets);
-    console.log(`\n✅ Done! Processed ${outputTickets.length} tickets → ${outputPath}`);
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+    console.log(`\n✅ Done! Processed ${outputTickets.length} tickets in ${elapsed}s → ${outputPath}`);
     
     // Summary
     const replied = outputTickets.filter(t => t.status === 'replied').length;
